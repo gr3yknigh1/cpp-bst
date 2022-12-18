@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 template<typename T>
 struct Node {
@@ -20,33 +21,6 @@ template<typename T>
 class BST {
 public:
     BST() : _root(nullptr), _length(0) {}
-
-    struct Iterator
-    {
-        using iterator_category = std::forward_iterator_tag;
-        using difference_type   = std::ptrdiff_t;
-        using value_type        = Node<T>;
-        using pointer           = Node<T>*;
-        using reference         = Node<T>&;
-
-        Iterator(pointer pointer) : _current(pointer) {}
-
-        reference operator*() const { return *_current; }
-        pointer operator->() { return _current; }
-        Iterator& operator++() { _current++; return *this; }
-        Iterator operator++(int) { Iterator tmp = *this; ++(*this); return tmp; }
-        friend bool operator== (const Iterator& a, const Iterator& b) { return a._current == b._current; };
-        friend bool operator!= (const Iterator& a, const Iterator& b) { return a._current != b._current; };
-
-        void Step() {
-        }
-
-    private:
-        pointer _current;
-    };
-
-    Iterator begin() { return Iterator(_root); }
-    Iterator end()   { return Iterator(GetMax()); }
 
     Node<T>* Insert(Node<T>* root, const std::string& key, const T* value) {
         if (root == nullptr) {
@@ -178,34 +152,67 @@ struct Person {
     unsigned int age;
 };
 
+
+int RandInt(int min, int max) {
+    /*
+     * Values in range: [min, max]
+     * */
+    return min + rand() % (max - min + 1);
+}
+
+const std::string GenerateString(unsigned long length) {
+    std::string string;
+    for (unsigned long i = 0; i < length; i++) {
+        string += (char)RandInt(65, 90);
+    }
+    return string;
+}
+
+const std::vector<Person> GeneratePersons(unsigned long count) {
+    std::vector<Person> persons;
+    persons.reserve(count);
+
+    for (unsigned long i = 0; i < count; i++) {
+        persons.emplace_back(
+            (Person){ GenerateString(10), (unsigned int)RandInt(1, 99) });
+    }
+
+    return persons;
+}
+
 int main() {
 
     BST<Person> bst;
+    auto persons = GeneratePersons(100);
 
-    Person p1 = { "Ilya", 19 };
-    Person p2 = { "Tolya", 18 };
-    Person p3 = { "Vaidm", 20 };
-    Person p4 = { "Kolya", 20 };
-    Person p5 = { "Seraphom", 20 };
-
-    bst.Insert("key1", &p1);
-    bst.Insert("key2", &p2);
-    bst.Insert("key3", &p3);
-    bst.Insert("key5", &p4);
-    bst.Insert("key10", &p5);
-    // bst.Delete("key5");
-
-    auto v = bst.Search("key5");
-    if (v != nullptr) {
-        PRINT(v->name);
+    for (auto & p : persons) {
+        bst.Insert(GenerateString(5), &p);
     }
 
-
-    PRINT("-- Count:");
-    PRINT(bst.GetCount());
-
-    PRINT("-- Max:");
-    PRINT(bst.GetMax()->key);
+    // Person p1 = { "Ilya", 19 };
+    // Person p2 = { "Tolya", 18 };
+    // Person p3 = { "Vaidm", 20 };
+    // Person p4 = { "Kolya", 20 };
+    // Person p5 = { "Seraphom", 20 };
+    //
+    // bst.Insert("key1", &p1);
+    // bst.Insert("key2", &p2);
+    // bst.Insert("key3", &p3);
+    // bst.Insert("key5", &p4);
+    // bst.Insert("key10", &p5);
+    // // bst.Delete("key5");
+    //
+    // auto v = bst.Search("key5");
+    // if (v != nullptr) {
+    //     PRINT(v->name);
+    // }
+    //
+    //
+    // PRINT("-- Count:");
+    // PRINT(bst.GetCount());
+    //
+    // PRINT("-- Max:");
+    // PRINT(bst.GetMax()->key);
 
     // for (auto n : bst) {
     //     PRINT(n.key);
@@ -213,7 +220,7 @@ int main() {
 
     PRINT("Inorder Tree Walk:");
     bst.InorderTreeWalk([](Node<Person>* n) {
-        PRINT(n->key);
+        PRINT("key: " << n->key << " name: " << n->value->name << " age: " << n->value->age);
     });
 
     return 0;
