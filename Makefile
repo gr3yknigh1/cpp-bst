@@ -17,6 +17,7 @@ OUTPUT  = $(BUILD_FOLDER)/prog
 
 INCLUDE = include
 
+
 default: all
 
 all: $(OUTPUT)
